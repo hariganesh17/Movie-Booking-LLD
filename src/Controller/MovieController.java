@@ -1,21 +1,22 @@
 package Controller;
 
 import Entity.Movie;
+import Enum.City;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import  Enum.City;
-
-public class MovieController {
-    Map<City, List<Movie>> cityVsMovie;
+public class MovieController{
     List<Movie> allMovies;
+    Map<City,List<Movie>> cityVsMovie;
+    Map<String,Movie> movieNameMap;
 
     public MovieController(){
-        cityVsMovie = new HashMap<>();
         allMovies = new ArrayList<>();
+        cityVsMovie = new HashMap<City, List<Movie>>();
+        movieNameMap = new HashMap<>();
     }
 
     public void addMovies(City city, Movie movie){
@@ -23,17 +24,14 @@ public class MovieController {
         List<Movie> movieList = cityVsMovie.getOrDefault(city,new ArrayList<>());
         movieList.add(movie);
         cityVsMovie.put(city,movieList);
+        movieNameMap.put(movie.getMovieName().toLowerCase(),movie);
     }
 
     public List<Movie> getAllMoviesByCity(City city){
-        return cityVsMovie.get(city);
+        return cityVsMovie.getOrDefault(city,new ArrayList<>());
     }
 
     public Movie getMovieByName(String movieName){
-        for(Movie m : allMovies){
-            if(m.getMovieName().equalsIgnoreCase(movieName))
-                return m;
-        }
-        return null;
+        return movieNameMap.get(movieName.toLowerCase());
     }
 }

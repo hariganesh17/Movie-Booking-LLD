@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Theater {
     int theatreId;
+    String theaterName;
     String address;
     City city;
     List<Screen> screen = new ArrayList<>();
@@ -18,6 +19,14 @@ public class Theater {
 
     public void setTheatreId(int theatreId) {
         this.theatreId = theatreId;
+    }
+
+    public String getTheaterName() {
+        return theaterName;
+    }
+
+    public void setTheaterName(String theaterName) {
+        this.theaterName = theaterName;
     }
 
     public String getAddress() {

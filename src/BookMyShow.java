@@ -6,134 +6,78 @@ import Enum.SeatCategory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class BookMyShow {
+    private final MovieController movieController;
+    private final TheaterController theaterController;
 
-    MovieController movieController;
-    TheaterController theatreController;
-
-    BookMyShow() {
-        movieController = new MovieController();
-        theatreController = new TheaterController();
+    public BookMyShow() {
+        BookingManager bookingManager = BookingManager.getInstance();
+        this.movieController = bookingManager.getMovieController();
+        this.theaterController = bookingManager.getTheaterController();
     }
 
-    private void initialize(){
-        createMovie();
-        createTheater();
+    public void initialize() {
+        createMovies();
+        createTheaters();
     }
 
-    private void createTheater(){
+    private void createMovies() {
+        Movie movie1 = new Movie(1, "Joker", 180);
+        Movie movie2 = new Movie(2, "Avenger", 120);
+        Movie movie3 = new Movie(3, "Hulk", 120);
 
-        Movie movie1 = movieController.getMovieByName("movie1");
+        movieController.addMovies(City.Chennai, movie1);
+        movieController.addMovies(City.Chennai, movie2);
+        movieController.addMovies(City.bangalore, movie3);
+    }
+
+    private void createTheaters() {
+        Movie movie1 = movieController.getMovieByName("Joker");
         Theater pvr = new Theater();
         pvr.setTheatreId(1);
         pvr.setCity(City.Chennai);
-        pvr.setScreen(createScreen());
+        pvr.setScreen(createScreens());
 
         List<Show> showList = new ArrayList<>();
-        Show morShow = createShows(1,pvr.getScreen().getFirst(),movie1,8);
-        Show eveShow = createShows(2,pvr.getScreen().getLast(),movie1,16);
-        showList.add(morShow);
-        showList.add(eveShow);
+        showList.add(createShow(1, movie1, pvr.getScreen().get(0), 9));
+        showList.add(createShow(2, movie1, pvr.getScreen().get(0), 12));
+
         pvr.setShows(showList);
 
-
-        theatreController.addTheater(pvr, City.Chennai);
-        theatreController.addTheater(pvr, City.bangalore);
-
-    }
-    private  void createMovie(){
-        Movie movie1 = new Movie();
-        movie1.setMovieId(1);
-        movie1.setMovieName("Movie1");
-        movie1.setMovieDuration(1234);
-
-        Movie movie2 = new Movie();
-        movie2.setMovieId(2);
-        movie2.setMovieName("Movie2");
-        movie2.setMovieDuration(1234);
-
-        Movie movie3 = new Movie();
-        movie3.setMovieId(3);
-        movie3.setMovieName("Movie3");
-        movie3.setMovieDuration(1234);
-
-        movieController.addMovies(City.Chennai,movie1);
-        movieController.addMovies(City.bangalore,movie2);
-        movieController.addMovies(City.Chennai,movie3);
+        theaterController.addTheater(City.Chennai, pvr);
+        theaterController.addTheater(City.bangalore, pvr);
     }
 
-    private List<Screen> createScreen(){
-        List<Screen> screenList = new ArrayList<>();
-        Screen screen1 = new Screen();
-        screen1.setScreenId(1);
-        screen1.setSeats(createSeats());
-        screenList.add(screen1);
-
-        return screenList;
+    private List<Screen> createScreens() {
+        List<Screen> screens = new ArrayList<>();
+        Screen screen = new Screen();
+        screen.setScreenId(1);
+        screen.setSeats(createSeats());
+        screens.add(screen);
+        return screens;
     }
 
-    private List<Seat> createSeats(){
-
+    private List<Seat> createSeats() {
         List<Seat> seatList = new ArrayList<>();
-        for(int i=1;i<=50;i++){
-            Seat seat = new Seat();
-            seat.setSeatId(i);
-            seat.setSeatCategory(SeatCategory.SILVER);
-            seatList.add(seat);
+        for (int i = 1; i <= 50; i++) {
+            seatList.add(new Seat(i, SeatCategory.SILVER));
         }
-        for(int i=51;i<=100;i++){
-            Seat seat = new Seat();
-            seat.setSeatId(i);
-            seat.setSeatCategory(SeatCategory.GOLD);
-            seatList.add(seat);
+        for (int i = 51; i <= 100; i++) {
+            seatList.add(new Seat(i, SeatCategory.GOLD));
+        }
+        for (int i = 101; i <= 150; i++) {
+            seatList.add(new Seat(i, SeatCategory.PLATINUM));
         }
         return seatList;
     }
 
-    private Show createShows(int showId,Screen screen, Movie movie, int showStartTime){
+    private Show createShow(int showId, Movie movie, Screen screen, int showStartTime) {
         Show show = new Show();
         show.setShowId(showId);
         show.setMovie(movie);
-        show.setShowStartTime(showStartTime);
         show.setScreen(screen);
-
+        show.setShowStartTime(showStartTime);
         return show;
     }
-
-    private  void createBooking(City city, String movieName){
-        List<Movie> movies = movieController.getAllMoviesByCity(city);
-        Movie interestedMovie = null;
-
-        for(Movie movie : movies){
-            if(movie.getMovieName().equalsIgnoreCase(movieName))
-                interestedMovie = movie;
-        }
-
-        Map<Theater,List<Show>> theaterListMap = theatreController.getAllShows(interestedMovie,city);
-        Map.Entry<Theater,List<Show>> entry = theaterListMap.entrySet().iterator().next();
-        List<Show> runningShows = entry.getValue();
-        Show interestedShow = runningShows.get(0);
-
-        int seatNum = 15;
-        List<Integer> bookedSeats = interestedShow.getBookedSeatIds();
-        if(!bookedSeats.contains(seatNum)){
-            bookedSeats.add(seatNum);
-        }else{
-            System.out.println("Seat has already booked");
-        }
-
-        System.out.println("BOOKING SUCCESSFUL");
-
-
-    }
-    public static void main(String[] args){
-        BookMyShow bookMyShow = new BookMyShow();
-        bookMyShow.initialize();
-
-        bookMyShow.createBooking(City.Chennai,"movie1");
-    }
-
-
 }
